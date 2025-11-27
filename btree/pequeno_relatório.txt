@@ -1,0 +1,151 @@
+os casos estão mais explicados abaixo.
+
+Que casos de remoção foram observados? 
+795, 397, 336, 2
+
+O algoritmo funcionou conforme esperado?
+sim.
+
+Houve merge? Houve empréstimos?
+sim.
+
+O que foi mais fácil/difícil?
+remover folhas é o mais fácil (como no primeiro exemplo) e remover causando merge é o mais complicado (como no ultimo)
+
+Em que situações a remoção simplifica o nó e quando ela complica?
+simplifica o cenário quando ocorre diretamente em um nó folha com muitas chaves. e complica ao atingir nós internos, o que exige substituições.
+
+original:
+[ 151 326 474 629 ]
+        [ 8 75 ]
+                [ 1 2 ]
+                [ 26 58 ]
+                [ 108 110 111 ]
+        [ 215 283 ]
+                [ 154 182 183 201 ]
+                [ 223 230 246 266 271 ]
+                [ 307 309 313 318 323 ]
+        [ 363 397 429 ]
+                [ 336 348 ]
+                [ 382 388 392 395 ]
+                [ 403 421 423 ]
+                [ 434 439 445 ]
+        [ 491 592 ]
+                [ 475 476 487 490 ]
+                [ 495 513 520 564 581 ]
+                [ 594 602 607 ]
+        [ 647 698 723 ]
+                [ 630 632 633 ]
+                [ 655 672 673 695 ]
+                [ 709 714 715 ]
+                [ 732 763 782 788 795 ]
+
+Ação: remove 795
+Expectativa: o nó folha mais à direita é removido. a chave some sem logs.
+
+[ 151 326 474 629 ]
+        [ 8 75 ]
+                [ 1 2 ]
+                [ 26 58 ]
+                [ 108 110 111 ]
+        [ 215 283 ]
+                [ 154 182 183 201 ]
+                [ 223 230 246 266 271 ]
+                [ 307 309 313 318 323 ]
+        [ 363 397 429 ]
+                [ 336 348 ]
+                [ 382 388 392 395 ]
+                [ 403 421 423 ]
+                [ 434 439 445 ]
+        [ 491 592 ]
+                [ 475 476 487 490 ]
+                [ 495 513 520 564 581 ]
+                [ 594 602 607 ]
+        [ 647 698 723 ]
+                [ 630 632 633 ]
+                [ 655 672 673 695 ]
+                [ 709 714 715 ]
+                [ 732 763 782 788 ]
+
+Ação: remove 397
+Expectativa: Houve debug, empréstimo predecessor (o maior filho à esquerda). O 395 sobe para o lugar do 397 que é deletado.
+ 
+[LOG] usando PREDECESSOR para substituir a chave 397
+[ 151 326 474 629 ]
+        [ 8 75 ]
+                [ 1 2 ]
+                [ 26 58 ]
+                [ 108 110 111 ]
+        [ 215 283 ]
+                [ 154 182 183 201 ]
+                [ 223 230 246 266 271 ]
+                [ 307 309 313 318 323 ]
+        [ 363 395 429 ]
+                [ 336 348 ]
+                [ 382 388 392 ]
+                [ 403 421 423 ]
+                [ 434 439 445 ]
+        [ 491 592 ]
+                [ 475 476 487 490 ]
+                [ 495 513 520 564 581 ]
+                [ 594 602 607 ]
+        [ 647 698 723 ]
+                [ 630 632 633 ]
+                [ 655 672 673 695 ]
+                [ 709 714 715 ]
+                [ 732 763 782 788 ]
+
+Ação: remove 336
+Expectativa: Houve debug, empréstimo sucessor (o menor filho à direita). o nó afetado fica com menos filhos do que deveria e pega emprestado com o irmão à direita. a chave do pai que divide os dois (363) desce para o nó afetado. a primeira chave do irmão (382) sobe para o pai. o nó afetado ganha a chave 363 do pai.
+
+[LOG] borrowFromNext(): O filho 0 pegou emprestado do irmão à DIREITA.
+[ 151 326 474 629 ]
+        [ 8 75 ]
+                [ 1 2 ]
+                [ 26 58 ]
+                [ 108 110 111 ]
+        [ 215 283 ]
+                [ 154 182 183 201 ]
+                [ 223 230 246 266 271 ]
+                [ 307 309 313 318 323 ]
+        [ 382 395 429 ]
+                [ 348 363 ]
+                [ 388 392 ]
+                [ 403 421 423 ]
+                [ 434 439 445 ]
+        [ 491 592 ]
+                [ 475 476 487 490 ]
+                [ 495 513 520 564 581 ]
+                [ 594 602 607 ]
+        [ 647 698 723 ]
+                [ 630 632 633 ]
+                [ 655 672 673 695 ]
+                [ 709 714 715 ]
+                [ 732 763 782 788 ]
+
+Ação: remove 2
+Expectativa: Houve debug, empréstimo merge. o nó fica apenas com uma chave (a 1) e vê que o irmão não pode emprestar. logo, nó afetado + irmão + chave 8 do pai (merge). depois o pai fica apenas com a chave 75 e como seu irmão não pode emprestar o processo se repete (outro merge), isso reduz a largura da arvore.
+
+[LOG] merge(): Realizando fusão (MERGE) no índice 0 envolvendo chave 151
+[LOG] merge(): Realizando fusão (MERGE) no índice 0 envolvendo chave 8
+[ 326 474 629 ]
+        [ 75 151 215 283 ]
+                [ 1 8 26 58 ]
+                [ 108 110 111 ]
+                [ 154 182 183 201 ]
+                [ 223 230 246 266 271 ]
+                [ 307 309 313 318 323 ]
+        [ 382 395 429 ]
+                [ 348 363 ]
+                [ 388 392 ]
+                [ 403 421 423 ]
+                [ 434 439 445 ]
+        [ 491 592 ]
+                [ 475 476 487 490 ]
+                [ 495 513 520 564 581 ]
+                [ 594 602 607 ]
+        [ 647 698 723 ]
+                [ 630 632 633 ]
+                [ 655 672 673 695 ]
+                [ 709 714 715 ]
+                [ 732 763 782 788 ]
